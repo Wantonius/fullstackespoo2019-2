@@ -25,6 +25,34 @@ class App extends React.Component {
 		})
 	}
 	
+	removeFromList = (id) => {
+		let tempId = parseInt(id,10);
+		let tempList = [];
+		for(let i=0;i<this.state.list.length;i++) {
+			if(this.state.list[i].id !== tempId) {
+				tempList.push(this.state.list[i]);
+			}
+		}
+		this.setState({
+			list:tempList
+		})
+	}
+	
+	editItem = (item) => {
+		console.log(item);
+		let tempList = [];
+		for(let i=0;i<this.state.list.length;i++) {
+			if(this.state.list[i].id !== item.id) {
+				tempList.push(this.state.list[i]);
+			} else {
+				tempList.push(item);
+			}			
+		}
+		this.setState({
+			list:tempList
+		})		
+	}
+	
 	render() {
 		return (
 			<div className="App">
@@ -32,7 +60,9 @@ class App extends React.Component {
 				<hr/>
 				<Switch>
 					<Route exact path="/" render={
-					() => <ShoppingList list={this.state.list}/>
+					() => <ShoppingList list={this.state.list}
+						removeFromList={this.removeFromList}
+						editItem={this.editItem}/>
 					}/>
 					<Route path="/form" render={
 					() => <ShoppingForm addToList={this.addToList}/>	
