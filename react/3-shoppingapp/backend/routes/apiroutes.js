@@ -36,6 +36,9 @@ router.delete("/shopping/:id",function(req,res) {
 	let id = req.params.id;
 	for(let i=0;i<database.length;i++) {
 		if(database[i].id == id) {
+			if(database[i].user !== req.session.user) {
+				return res.status(409).json({message:"conflict"})
+			}
 			database.splice(i,1);
 			return res.status(200).json({message:"success"});
 		}
@@ -49,10 +52,14 @@ router.put("/shopping/:id", function(req,res) {
 		id:id,
 		type:req.body.type,
 		count:req.body.count,
-		price:req.body.price
+		price:req.body.price,
+		user:req.session.user
 	}
 	for(let i=0;i<database.length;i++) {
 		if(database[i].id == id) {
+			if(database[i].user !== req.session.user) {
+				return res.status(409).json({message:"conflict"})
+			}			
 			database.splice(i,1,item);
 			return res.status(200).json({message:"success"});
 		}

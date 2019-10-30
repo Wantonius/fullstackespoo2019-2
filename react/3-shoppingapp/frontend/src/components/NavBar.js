@@ -8,6 +8,10 @@ export default class NavBar extends React.Component {
 		this.props.logout();
 	}
 	render() {
+		let header = "Shopping App";
+		if(this.props.loading) {
+			header = "Loading ...";
+		}
 		let style = {
 			height:100,
 			backgroundColor:"lightblue"
@@ -15,7 +19,7 @@ export default class NavBar extends React.Component {
 		if(this.props.isLogged) {
 			return(
 				<div style={style}>
-					<Header>Shopping App</Header>
+					<Header>{header}</Header>
 					<List>
 						<List.Item><Link to="/list">Shopping List</Link></List.Item>
 						<List.Item><Link to="/form">Add new item</Link></List.Item>
@@ -28,7 +32,7 @@ export default class NavBar extends React.Component {
 		} else {
 			return (
 				<div style={style}>
-					<Header>Shopping App</Header>
+					<Header>{header}</Header>
 				</div>
 			)
 			

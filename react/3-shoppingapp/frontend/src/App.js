@@ -13,7 +13,8 @@ class App extends React.Component {
 		this.state= {
 			list:[],
 			token:"",
-			isLogged:false
+			isLogged:false,
+			loading:false
 		}
 	}
 	
@@ -35,6 +36,22 @@ class App extends React.Component {
 		sessionStorage.setItem("state",JSON.stringify(this.state));
 	}
 	
+	sessionExpired = () => {
+		this.setState({
+			isLogged:false,
+			token:"",
+			list:[],
+			loading:false
+		}, () => {
+			this.saveToStorage();
+		})
+	}
+	
+	changeLoadingState = (loading) => {
+		this.setState({
+			loading:loading
+		})
+	}
 	//LOGIN API	
 
 	register = (user) => {
@@ -44,13 +61,16 @@ class App extends React.Component {
 			headers:{"Content-type":"application/json"},
 			body:JSON.stringify(user)
 		}
+		this.changeLoadingState(true);
 		fetch("/register",request).then((response) => {
+			this.changeLoadingState(false);
 			if(response.ok) {
 				alert("Register success!");
 			} else {
 				console.log("Server responded with status:"+response.status);
 			}
 		}).catch((error) => {
+			this.changeLoadingState(false);
 			console.log("Server responded with error:"+error);
 		})
 	}
@@ -62,7 +82,9 @@ class App extends React.Component {
 			headers:{"Content-type":"application/json"},
 			body:JSON.stringify(user)
 		}
+		this.changeLoadingState(true);
 		fetch("/login",request).then((response) => {
+			this.changeLoadingState(false);
 			if(response.ok) {
 				response.json().then(data => {
 					this.setState({
@@ -79,6 +101,7 @@ class App extends React.Component {
 				console.log("Server responded with status:"+response.status);
 			}
 		}).catch((error) => {
+			this.changeLoadingState(false);
 			console.log("Server responded with error:"+error);
 		})
 	}
@@ -90,11 +113,13 @@ class App extends React.Component {
 			headers:{"Content-type":"application/json",
 					 "token":this.state.token}
 		}
+		this.changeLoadingState(true);
 		fetch("/logout",request).then(response => {
 			this.setState({
 				list:[],
 				token:"",
-				isLogged:false
+				isLogged:false,
+				loading:false
 			}, () => {
 				this.saveToStorage();
 			}) 	
@@ -103,7 +128,8 @@ class App extends React.Component {
 			this.setState({
 				list:[],
 				token:"",
-				isLogged:false
+				isLogged:false,
+				loading:false
 			}, () => {
 				this.saveToStorage();
 			}) 
@@ -120,7 +146,9 @@ class App extends React.Component {
 			headers:{"Content-type":"application/json",
 					 "token":this.state.token}
 		}
+		this.changeLoadingState(true);
 		fetch("/api/shopping",request).then((response) => {
+			this.changeLoadingState(false);
 			if(response.ok) {
 				response.json().then((data) => {
 						this.setState({
@@ -132,9 +160,13 @@ class App extends React.Component {
 					console.log("Failed to handle JSON:"+error);
 				});
 			} else {
+				if(response.status === 403) {
+					this.sessionExpired();
+				}
 				console.log("Server responded with status:"+response.status);
 			}
 		}).catch((error) => {
+			this.changeLoadingState(false);
 			console.log("Server responded with an error:"+error);
 		});
 	}
@@ -147,13 +179,19 @@ class App extends React.Component {
 					 "token":this.state.token},
 			body:JSON.stringify(item)
 		}
+		this.changeLoadingState(true);
 		fetch("/api/shopping",request).then((response) => {
 			if(response.ok) {
 				this.getList();
 			} else {
+				this.changeLoadingState(false);
+				if(response.status === 403) {
+					this.sessionExpired();
+				}
 				console.log("Server responded with status:"+response.status)
 			}		
 		}).catch((error) => {
+			this.changeLoadingState(false);
 			console.log("Server responded with error:"+error);
 		});
 	}
@@ -165,13 +203,19 @@ class App extends React.Component {
 			headers:{"Content-type":"application/json",
 					 "token":this.state.token}
 		}
+		this.changeLoadingState(true);
 		fetch("/api/shopping/"+id,request).then((response) => {
 			if(response.ok) {
 				this.getList();
 			} else {
+				this.changeLoadingState(false);
+				if(response.status === 403) {
+					this.sessionExpired();
+				}
 				console.log("Server responded with status:"+response.status)
 			}		
 		}).catch((error) => {
+			this.changeLoadingState(false);
 			console.log("Server responded with error:"+error);
 		});
 	}
@@ -184,13 +228,19 @@ class App extends React.Component {
 					 "token":this.state.token},
 			body:JSON.stringify(item)
 		}
+		this.changeLoadingState(true);
 		fetch("/api/shopping/"+item.id,request).then((response) => {
 			if(response.ok) {
 				this.getList();
 			} else {
+				this.changeLoadingState(false);
+				if(response.status === 403) {
+					this.sessionExpired();
+				}
 				console.log("Server responded with status:"+response.status)
 			}		
 		}).catch((error) => {
+			this.changeLoadingState(false);
 			console.log("Server responded with error:"+error);
 		});
 	}
@@ -199,7 +249,8 @@ class App extends React.Component {
 		return (
 			<div className="App">
 				<NavBar isLogged={this.state.isLogged}
-						logout={this.logout}/>
+						logout={this.logout}
+						loading={this.state.loading}/>
 				<hr/>
 				<Switch>
 					<Route exact path="/" render= {
