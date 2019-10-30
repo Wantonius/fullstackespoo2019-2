@@ -31,6 +31,8 @@ isUserLogged = (req,res,next) => {
 	}
 	for(let i=0;i<loggedUsers.length;i++) {
 		if(token === loggedUsers[i].token) {
+			req.session = {}
+			req.session.user = loggedUsers[i].user
 			return next();
 		}
 	}
@@ -91,6 +93,20 @@ app.post("/login",function(req,res) {
 		}
 	}
 	return res.status(403).json({message:"Username or password not correct"})
+})
+
+app.post("/logout",function(req,res) {
+	let token = req.headers.token;
+	if(!token) {
+		return res.status(404).json({message:"not found"});
+	}
+	for(let i=0;i<loggedUsers.length;i++) {
+		if(loggedUsers.token === token) {
+			loggedUsers.splice(i,1);
+			return res.status(200).json({message:"logged out"});
+		}
+	}
+	return res.status(404).json({message:"not found"});
 })
 
 app.use("/api",isUserLogged,apiroutes);

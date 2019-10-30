@@ -1,5 +1,5 @@
 import React from 'react';
-import {Switch,Route} from 'react-router-dom';
+import {Switch,Route,Redirect} from 'react-router-dom';
 import ShoppingForm from './components/ShoppingForm';
 import NavBar from './components/NavBar';
 import ShoppingList from './components/ShoppingList';
@@ -18,9 +18,21 @@ class App extends React.Component {
 	}
 	
 	componentDidMount() {
-		if(this.state.isLogged) {
-			this.getList();
+		if(sessionStorage.getItem("state")) {
+			let state = JSON.parse(sessionStorage.getItem("state"));
+			this.setState(state,() => {
+				if(this.state.isLogged) {
+					this.getList();
+				}
+			});
 		}
+
+	}
+	
+	//HELPER FUNCTIONS
+	
+	saveToStorage = () => {
+		sessionStorage.setItem("state",JSON.stringify(this.state));
 	}
 	
 	//LOGIN API	
@@ -58,6 +70,7 @@ class App extends React.Component {
 						isLogged:true
 					},() => {
 						this.getList();
+						this.saveToStorage();
 					})
 				}).catch((error) => {
 					console.log("JSON parse failed with error:"+error);
@@ -68,6 +81,34 @@ class App extends React.Component {
 		}).catch((error) => {
 			console.log("Server responded with error:"+error);
 		})
+	}
+	
+	logout = () => {
+		let request = {
+			method:"POST",
+			mode:"cors",
+			headers:{"Content-type":"application/json",
+					 "token":this.state.token}
+		}
+		fetch("/logout",request).then(response => {
+			this.setState({
+				list:[],
+				token:"",
+				isLogged:false
+			}, () => {
+				this.saveToStorage();
+			}) 	
+		}).catch(error => {
+			console.log("Server responded with error:"+error);
+			this.setState({
+				list:[],
+				token:"",
+				isLogged:false
+			}, () => {
+				this.saveToStorage();
+			}) 
+		})
+
 	}
 	
 	//SHOPPING API
@@ -84,6 +125,8 @@ class App extends React.Component {
 				response.json().then((data) => {
 						this.setState({
 							list:data
+						},() => {
+							this.saveToStorage();
 						})
 				}).catch((error) => {
 					console.log("Failed to handle JSON:"+error);
@@ -155,21 +198,29 @@ class App extends React.Component {
 	render() {
 		return (
 			<div className="App">
-				<NavBar/>
+				<NavBar isLogged={this.state.isLogged}
+						logout={this.logout}/>
 				<hr/>
 				<Switch>
 					<Route exact path="/" render= {
-						() => <LoginForm login={this.login}
-								register={this.register}/>
+						() => this.state.isLogged ?
+						(<Redirect to="/list"/>) :
+						(<LoginForm login={this.login}
+								register={this.register}/>)
 					}/>
 					<Route path="/list" render={
-					() => <ShoppingList list={this.state.list}
+					() => this.state.isLogged ? 
+					(<ShoppingList list={this.state.list}
 						removeFromList={this.removeFromList}
-						editItem={this.editItem}/>
+						editItem={this.editItem}/>) :
+						(<Redirect to="/"/>)
 					}/>
 					<Route path="/form" render={
-					() => <ShoppingForm addToList={this.addToList}/>	
+					() => this.state.isLogged ? 
+					(<ShoppingForm addToList={this.addToList}/>):
+					(<Redirect to="/"/>)
 					}/>
+					<Route render={() => <Redirect to="/"/>}/>
 				</Switch>
 			</div>
 		)

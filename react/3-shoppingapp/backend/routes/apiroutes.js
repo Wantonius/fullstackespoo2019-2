@@ -10,7 +10,13 @@ let id = 100
 //Shopping API
 
 router.get("/shopping", function(req,res) {
-	return res.status(200).json(database);
+	let tempDatabase = [];
+	for(let i=0;i<database.length;i++) {
+		if(req.session.user === database[i].user) {
+			tempDatabase.push(database[i])
+		}
+	}
+	return res.status(200).json(tempDatabase);
 });
 
 router.post("/shopping", function(req,res) {
@@ -18,7 +24,8 @@ router.post("/shopping", function(req,res) {
 		id:id,
 		type:req.body.type,
 		count:req.body.count,
-		price:req.body.price
+		price:req.body.price,
+		user:req.session.user
 	}
 	database.push(item);
 	id++;
