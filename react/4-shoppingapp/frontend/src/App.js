@@ -139,7 +139,7 @@ class App extends React.Component {
 	
 	//SHOPPING API
 	
-	getList = () => {
+	getList = (search) => {
 		let request = {
 			method:"GET",
 			mode:"cors",
@@ -147,7 +147,11 @@ class App extends React.Component {
 					 "token":this.state.token}
 		}
 		this.changeLoadingState(true);
-		fetch("/api/shopping",request).then((response) => {
+		let url = "/api/shopping";
+		if(search) {
+			url = url + "?type="+search;
+		}
+		fetch(url,request).then((response) => {
 			this.changeLoadingState(false);
 			if(response.ok) {
 				response.json().then((data) => {
@@ -229,7 +233,7 @@ class App extends React.Component {
 			body:JSON.stringify(item)
 		}
 		this.changeLoadingState(true);
-		fetch("/api/shopping/"+item.id,request).then((response) => {
+		fetch("/api/shopping/"+item._id,request).then((response) => {
 			if(response.ok) {
 				this.getList();
 			} else {
@@ -263,7 +267,8 @@ class App extends React.Component {
 					() => this.state.isLogged ? 
 					(<ShoppingList list={this.state.list}
 						removeFromList={this.removeFromList}
-						editItem={this.editItem}/>) :
+						editItem={this.editItem}
+						getList={this.getList}/>) :
 						(<Redirect to="/"/>)
 					}/>
 					<Route path="/form" render={

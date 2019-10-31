@@ -1,5 +1,5 @@
 import React from 'react';
-import {Table} from 'semantic-ui-react';
+import {Table,Button} from 'semantic-ui-react';
 import Row from './Row';
 import RemoveRow from './RemoveRow';
 import EditRow from './EditRow';
@@ -10,14 +10,27 @@ export default class ShoppingList extends React.Component {
 		super(props);
 		this.state = {
 			removeIndex:-1,
-			editIndex:-1
+			editIndex:-1,
+			search:""
 		}
+	}
+
+	change = (event) => {
+		let state = {};
+		state[event.target.name] = event.target.value;
+		this.setState(state);
+	}
+
+	searchByType = (event) => {
+		this.props.getList(this.state.search);
+		this.setState({
+			search:""
+		})
 	}
 	
 	changeToRemoveMode = (id) => {
-		let tempId = parseInt(id,10);
 		for(let i=0;i<this.props.list.length;i++) {
-			if(tempId === this.props.list[i].id) {
+			if(id === this.props.list[i]._id) {
 				this.setState({
 					removeIndex:i,
 					editIndex:-1
@@ -27,9 +40,8 @@ export default class ShoppingList extends React.Component {
 	}
 	
 	changeToEditMode = (id) => {
-		let tempId = parseInt(id,10);
 		for(let i=0;i<this.props.list.length;i++) {
-			if(tempId === this.props.list[i].id) {
+			if(id === this.props.list[i]._id) {
 				this.setState({
 					removeIndex:-1,
 					editIndex:i
@@ -58,20 +70,27 @@ export default class ShoppingList extends React.Component {
 	render() {
 		let items = this.props.list.map((item,index) => {
 			if(this.state.editIndex === index) {
-				return <EditRow key={item.id} item={item}
+				return <EditRow key={item._id} item={item}
 					editItem={this.editItem} cancel={this.cancel}/>
 			}
 			if(this.state.removeIndex === index) {
-				return <RemoveRow key={item.id} item={item}
+				return <RemoveRow key={item._id} item={item}
 						cancel={this.cancel}
 						removeFromList={this.removeFromList}/>
 			}
-			return <Row key={item.id} item={item}
+			return <Row key={item._id} item={item}
 				changeToRemoveMode={this.changeToRemoveMode}
 				changeToEditMode={this.changeToEditMode}/>
 		
 		})
 		return(
+		<div>
+			<label htmlFor="search">Search by type:</label>
+			<input type="text"
+					name="search"
+					onChange={this.change}
+					value={this.state.search}/>
+			<Button style={{marginLeft:10}} onClick={this.searchByType}>Search</Button>
 			<Table celled>
 				<Table.Header>
 					<Table.Row>
@@ -86,7 +105,7 @@ export default class ShoppingList extends React.Component {
 				{items}
 				</Table.Body>
 			</Table>
-		
+		</div>
 		)
 	}
 
