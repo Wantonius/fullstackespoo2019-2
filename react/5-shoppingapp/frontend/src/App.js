@@ -102,7 +102,7 @@ class App extends React.Component {
 				console.log("Server responded with status:"+response.status)
 			}		
 		}).catch((error) => {
-			this.changeLoadingState(false);
+
 			console.log("Server responded with error:"+error);
 		});
 	}
