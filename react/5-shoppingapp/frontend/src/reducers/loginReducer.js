@@ -9,61 +9,90 @@ import {
 	LOGOUT_FAILED
 } from '../actions/loginActions';
 
-const initialState = {
-	isLogged:false,
-	token:[],
-	loading:false,
-	error:""
+const getInitialState = () => {
+	if(sessionStorage.getItem("loginstate")) {
+		let state = JSON.parse(sessionStorage.getItem("loginstate"));
+		return state;
+	} else {
+		return {
+			isLogged:false,
+			token:[],
+			loading:false,
+			error:""
+		}
+	}
+}
+const saveToStorage = (state) => {
+	sessionStorage.setItem("loginstate",JSON.stringify(state));
 }
 
+const initialState = getInitialState();
+
 const loginReducer = (state=initialState,action) => {
+	let tempState = {}
 	switch(action.type) {
 		case FETCH_LOADING:
-			return {
+			tempState = {
 				...state,
 				loading:true
 			}
+			saveToStorage(tempState);
+			return tempState;
 		case LOADING_DONE:
-			return {
+			tempState = {
 				...state,
 				loading:false
 			}
-		case REGISTER_SUCCESS:
-			return {
+			saveToStorage(tempState);
+			return tempState;
+		case REGISTER_SUCCESS:			
+			tempState = {
 				...state,
 				error:""
 			}
+			saveToStorage(tempState);
+			return tempState;
 		case REGISTER_FAILED:
-			return {
+			tempState = {
 				...state,
 				error:action.error
 			}
+			saveToStorage(tempState);
+			return tempState;
 		case LOGIN_SUCCESS: 
-			return {
+			tempState = {
 				...state,
 				isLogged:true,
 				token:action.token,
 				error:""
 			}
+			saveToStorage(tempState);
+			return tempState;
 		case LOGIN_FAILED:
-			return {
+			tempState = {
 				...state,
 				error:action.error
 			}
+			saveToStorage(tempState);
+			return tempState;
 		case LOGOUT_SUCCESS:
-			return {
+			tempState = {
 				...state,
 				isLogged:false,
 				token:"",
 				error:""
 			}
+			saveToStorage(tempState);
+			return tempState;
 		case LOGOUT_FAILED:
-			return {
+			tempState = {
 				...state,
 				isLogged:false,
 				token:"",
 				error:action.error
 			}
+			saveToStorage(tempState);
+			return tempState;
 		default:
 			return state;
 	}

@@ -5,7 +5,6 @@ export default class EditRow extends React.Component {
 
 	constructor(props) {
 		super(props);
-		console.log(props);
 		this.state = {
 			type:props.item.type,
 			count:props.item.count,
