@@ -2,6 +2,7 @@ import React from 'react';
 import {Switch,Route,Redirect} from 'react-router-dom';
 import {connect} from 'react-redux';
 import {withRouter} from 'react-router-dom'
+import {getList} from './actions/shoppingActions';
 import ShoppingForm from './components/ShoppingForm';
 import NavBar from './components/NavBar';
 import ShoppingList from './components/ShoppingList';
@@ -18,13 +19,8 @@ class App extends React.Component {
 	}
 	
 	componentDidMount() {
-		if(sessionStorage.getItem("state")) {
-			let state = JSON.parse(sessionStorage.getItem("state"));
-			this.setState(state,() => {
-				if(this.props.isLogged) {
-					this.getList();
-				}
-			});
+		if(this.props.isLogged) {
+			this.props.dispatch(getList(this.props.token));
 		}
 
 	}
@@ -39,35 +35,6 @@ class App extends React.Component {
 
 	//SHOPPING API
 	
-	getList = (search) => {
-		let request = {
-			method:"GET",
-			mode:"cors",
-			headers:{"Content-type":"application/json",
-					 "token":this.props.token}
-		}
-		let url = "/api/shopping";
-		if(search) {
-			url = url + "?type="+search;
-		}
-		fetch(url,request).then((response) => {
-			if(response.ok) {
-				response.json().then((data) => {
-						this.setState({
-							list:data
-						},() => {
-							this.saveToStorage();
-						})
-				}).catch((error) => {
-					console.log("Failed to handle JSON:"+error);
-				});
-			} else {
-				console.log("Server responded with status:"+response.status);
-			}
-		}).catch((error) => {
-			console.log("Server responded with an error:"+error);
-		});
-	}
 	
 	addToList = (item) => {
 		let request = { 
@@ -139,10 +106,9 @@ class App extends React.Component {
 					}/>
 					<Route path="/list" render={
 					() => this.props.isLogged ? 
-					(<ShoppingList list={this.state.list}
+					(<ShoppingList
 						removeFromList={this.removeFromList}
-						editItem={this.editItem}
-						getList={this.getList}/>) :
+						editItem={this.editItem}/>) :
 						(<Redirect to="/"/>)
 					}/>
 					<Route path="/form" render={
@@ -159,8 +125,8 @@ class App extends React.Component {
 
 const mapStateToProps = (state) => {
 	return {
-		isLogged:state.isLogged,
-		token:state.token
+		isLogged:state.login.isLogged,
+		token:state.login.token
 	}
 }
 

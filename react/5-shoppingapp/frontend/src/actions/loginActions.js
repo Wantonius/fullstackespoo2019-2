@@ -1,4 +1,6 @@
 //ACTION CONSTANTS
+import {removeState} from './shoppingActions';
+
 export const FETCH_LOADING = "FETCH_LOADING"
 export const LOADING_DONE = "LOADING_DONE"
 export const LOGIN_SUCCESS = "LOGIN_SUCCESS"
@@ -73,9 +75,11 @@ export const onLogout = (token) => {
 		dispatch(fetchLoading());
 		fetch("/logout",request).then(response => {
 			dispatch(loadingDone());
-			dispatch(logoutSuccess());
+			dispatch(removeState());
+			dispatch(logoutSuccess());			
 		}).catch(error => {
 			dispatch(loadingDone());
+			dispatch(removeState());
 			dispatch(logoutFailed("Logged out but server responded with error:"+error));
 		})
 	}	
@@ -122,7 +126,7 @@ const loginFailed = (error) => {
 	}
 }
 
-const logoutSuccess = () => {
+export const logoutSuccess = () => {
 	return {
 		type:LOGOUT_SUCCESS
 	}
