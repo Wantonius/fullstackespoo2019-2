@@ -1,0 +1,7 @@
+<button (click)="show=!show">{{show?"Hide":"Show"}}</button>
+<div *ngIf="show; else elseblock">Showing true</div>
+<ng-template #elseblock>
+	<div>
+		Showing false
+	</div>
+</ng-template>

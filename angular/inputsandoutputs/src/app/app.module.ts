@@ -2,12 +2,14 @@ import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 
 import { AppComponent } from './app.component';
-import { HelloWorld } from './helloworld.component';
+import { Apple } from './apple.component';
+import { Bucket } from './bucket.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-	HelloWorld
+	Apple,
+	Bucket
   ],
   imports: [
     BrowserModule

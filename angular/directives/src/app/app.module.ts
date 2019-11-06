@@ -2,12 +2,14 @@ import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 
 import { AppComponent } from './app.component';
-import { HelloWorld } from './helloworld.component';
+import { Conditional} from './conditional.component'
+import { Datalist} from './datalist.component'
 
 @NgModule({
   declarations: [
     AppComponent,
-	HelloWorld
+	Conditional,
+	Datalist
   ],
   imports: [
     BrowserModule
