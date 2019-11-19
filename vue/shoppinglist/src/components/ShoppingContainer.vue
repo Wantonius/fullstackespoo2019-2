@@ -1,9 +1,9 @@
-
 <template>
 	<div>
 		<ShoppingForm @add-to-list="addToList(...arguments)"/>
 		<hr/>
-		<ShoppingList v-bind:list="list" @remove-from-list="remove(...arguments)"/>
+		<ShoppingList v-bind:list="list" @remove-from-list="remove(...arguments)"
+		@edit-item="edit(...arguments)"/>
 	</div>
 </template>
 <script>
@@ -35,6 +35,14 @@ export default {
 				}
 			}
 			
+		},
+		edit:function(item) {
+			for(let i=0;i<this.list.length;i++) {
+				if(item.id === this.list[i].id) {
+					this.list.splice(i,1,item);
+					return;
+				}
+			}		
 		}
 	}
 
