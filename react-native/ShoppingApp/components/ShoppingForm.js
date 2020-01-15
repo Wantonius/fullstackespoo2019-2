@@ -9,12 +9,15 @@ import {
 } from 'react-native';
 
 export default class ShoppingForm extends React.Component {
-	
-	state = {
-		type:"",
-		price:"",
-		count:""
+	constructor(props) {
+		super(props);	
+		this.state = {
+			type:"",
+			price:"",
+			count:""
+		}
 	}
+	
 	
 	styles = {
 		hilightStyle: {
@@ -31,7 +34,18 @@ export default class ShoppingForm extends React.Component {
 	}
 	
 	addToList = (event) => {
-		
+		let item = {
+			id:0,
+			type:this.state.type,
+			price:this.state.price,
+			count:this.state.count
+		}
+		this.props.addToList(item);
+		this.setState({
+			type:"",
+			price:"",
+			count:""
+		})
 	}
 	
 	render() {
